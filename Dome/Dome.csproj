@@ -42,14 +42,6 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="T4\业务逻辑\Action2.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Action.tt</DependentUpon>
-    </Compile>
-    <Compile Include="T4\业务逻辑\MES_ProductionPlanAction.cs">
-      <DependentUpon>Action.tt</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="T4\MultipleOutputHelper.ttinclude" />
