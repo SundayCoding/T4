@@ -2,3 +2,6 @@
 /Web_Mes/bin
 /Dome/T4/实体/*.cs
 /Dome/T4/业务逻辑/*.cs
+/Web_Mes/WebMes/Model/*.cs
+/Web_Mes/WebMes/控制器/*.cs
+/Web_Mes/WebMes/业务逻辑/*.cs
