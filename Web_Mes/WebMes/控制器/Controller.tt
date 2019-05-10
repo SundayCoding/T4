@@ -38,18 +38,17 @@
 			command.CommandText = selectQuery.Replace("@tableName",row["TABLE_NAME"].ToString());
 			ad.FillSchema(ds, SchemaType.Mapped,tb_name);  
 			manager.StartNewFile(tb_name+"Controller.cs");#>
-using FttData.Api.BLL.Base;
-using FttData.Api.BLL.Service.IECenter;
 using FttData.Core;
 using FttData.Core.Rules;
 using FttData.Model.WEB.Base;
 using FttData.Model.WEB.<#=tb_name.Trim()#>Model;
 using System.Collections.Generic;
 using System.Web.Http;
+using FttData.Api.BLL.Service;
 namespace FttData.Api.Controllers.VersionWEB
 {	
 	/// <summary>
-    /// <#=tb_name#>Name控制器
+    /// <#=tb_name#>_Name控制器
     /// </summary>
 	public partial class <#=tb_name.Trim()#>Controller : ApiController
 	{<#
@@ -114,25 +113,25 @@ namespace FttData.Api.Controllers.VersionWEB
 			}
 		#>
 		  
-		#region <#=tb_name#>Name(Get)
+		#region <#=tb_name#>_Name(Get)
 		/// <summary>
-		///获取 <#=tb_name#>Name
+		///获取 <#=tb_name#>_Name
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ApiBaseResponseTotal<dynamic> Get(ApiPageBaseRequestModel<T> request)
+        public ApiBaseResponseTotal<dynamic> Get(ApiPageBaseRequestModel<Parameters> request)
         {
             var response = new ApiBaseResponseTotal<dynamic>();
             if (!this.CheckUser(request, response, out UserRule user))
                 return response;
-            SampleIEService service = new SampleIEService();
+            <#=tb_name#>Service service = new <#=tb_name#>Service(user);
             return service.Get(request);
         }
 		#endregion
 
-		#region <#=tb_name#>Name(Add)
+		#region <#=tb_name#>_Name(Add)
 		/// <summary>
-        /// 增加基本工艺标准
+        ///  添加<#=tb_name#>_Name
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -141,14 +140,14 @@ namespace FttData.Api.Controllers.VersionWEB
             var response = new ApiBaseResponseModel();
             if (!this.CheckUser(request, response, out UserRule user))
                 return response;
-            SampleIEService service = new SampleIEService();
-            return service.Add(request, user);
+            <#=tb_name#>Service service = new <#=tb_name#>Service(user);
+            return service.Add(request);
         }
 		#endregion
 
-		#region <#=tb_name#>Name(Update)
+		#region <#=tb_name#>_Name(Update)
 		/// <summary>
-        /// 编辑
+        /// 编辑 <#=tb_name#>_Name
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -157,14 +156,14 @@ namespace FttData.Api.Controllers.VersionWEB
             var response = new ApiBaseResponseModel();
             if (!this.CheckUser(request, response, out UserRule user))
                 return response;
-            SampleIEService service = new SampleIEService();
-            return service.Update(request, user);
+            <#=tb_name#>Service service = new <#=tb_name#>Service(user);
+            return service.Update(request);
         }
 		#endregion
 
-		#region <#=tb_name#>Name(Delete)
+		#region <#=tb_name#>_Name(Delete)
 		 /// <summary>
-        /// 删除基本工艺标准
+        /// 删除 <#=tb_name#>_Name
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -173,14 +172,14 @@ namespace FttData.Api.Controllers.VersionWEB
             var response = new ApiBaseResponseModel();
             if (!this.CheckUser(request, response, out UserRule user))
                 return response;
-            SampleIEService service = new SampleIEService();
+            <#=tb_name#>Service service = new <#=tb_name#>Service(user);
             return service.Delete(request);
         }
 		#endregion
 
-		#region <#=tb_name#>Name(Copy)
+		#region <#=tb_name#>_Name(Copy)
 		/// <summary>
-        /// 复制
+        /// 复制 <#=tb_name#>_Name
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -189,7 +188,7 @@ namespace FttData.Api.Controllers.VersionWEB
             var response = new ApiBaseResponseModel();
             if (!this.CheckUser(request, response, out UserRule user))
                 return response;
-            SampleIEService service = new SampleIEService();
+            <#=tb_name#>Service service = new <#=tb_name#>Service(user);
             return service.Copy(request);
         }
 		#endregion

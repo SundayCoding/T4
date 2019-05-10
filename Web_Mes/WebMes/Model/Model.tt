@@ -41,8 +41,18 @@ using System;
 using System.Collections.Generic;
 namespace FttData.Model.WEB.<#=tb_name#>Model  
 {	
+	#region 查询模板
 	/// <summary>
-	/// 实体-<#=tb_name#> 
+    /// <#=tb_name#>_Name查询条件
+    /// </summary>
+    public class Parameters
+    {
+    }
+	#endregion
+
+	#region 实体
+	/// <summary>
+	/// 实体-<#=tb_name#>_Name 
 	/// </summary>
 	public partial class <#=tb_name#>Model    
 	{	
@@ -64,6 +74,7 @@ namespace FttData.Model.WEB.<#=tb_name#>Model
 		PopIndent();
 		#>
 	}
+	#endregion
 }
 	
 <#
