@@ -1,0 +1,220 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.xml" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Data" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+
+//  导入MultipleOutputHelper.ttinclude文件ce
+<#@ include file="..\MultipleOutputHelper.ttinclude" #>
+
+<#		
+		//生成单张表
+		var createname="MES_ProductionPlan";
+		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
+		SqlConnection conn = new SqlConnection(connectionString);
+		conn.Open();
+	
+		string selectQuery ="SET FMTONLY ON; select * from @tableName; SET FMTONLY OFF;";
+		SqlCommand command = new SqlCommand(selectQuery,conn);
+		SqlDataAdapter ad = new SqlDataAdapter(command);
+		System.Data.DataSet ds = new DataSet(); 
+  
+		var manager = Manager.Create(Host, GenerationEnvironment);  
+
+		System.Data.DataTable schema = conn.GetSchema("Tables");
+		List<DataRow> datarow = new List<DataRow>();
+		if(!string.IsNullOrEmpty(createname)){
+			datarow=schema.Select( string.Format("TABLE_TYPE = 'BASE TABLE' and TABLE_NAME='{0}'",createname)).ToList();
+        }else{
+			datarow=schema.Select("TABLE_TYPE = 'BASE TABLE' ").ToList();
+        }
+		foreach(System.Data.DataRow row in datarow)
+		{	
+			ds.Tables.Clear();
+			string tb_name= row["TABLE_NAME"].ToString();		
+			command.CommandText = selectQuery.Replace("@tableName",row["TABLE_NAME"].ToString());
+			ad.FillSchema(ds, SchemaType.Mapped,tb_name);  
+			manager.StartNewFile(tb_name+"Controller.cs");#>
+using FttData.Api.BLL.Base;
+using FttData.Api.BLL.Service.IECenter;
+using FttData.Core;
+using FttData.Core.Rules;
+using FttData.Model.WEB.Base;
+using FttData.Model.WEB.<#=tb_name.Trim()#>Model;
+using System.Collections.Generic;
+using System.Web.Http;
+namespace FttData.Api.Controllers.VersionWEB
+{	
+	/// <summary>
+    /// <#=tb_name#>Name控制器
+    /// </summary>
+	public partial class <#=tb_name.Trim()#>Controller : ApiController
+	{<#
+		string fkQuery = " SELECT f.name AS ForeignKey,";
+		fkQuery += " OBJECT_NAME(f.parent_object_id) AS TableName, ";
+		fkQuery += " COL_NAME(fc.parent_object_id, fc.parent_column_id) AS ColumnName, ";
+		fkQuery += " OBJECT_NAME (f.referenced_object_id) AS ReferenceTableName, ";
+		fkQuery += " COL_NAME(fc.referenced_object_id, fc.referenced_column_id) AS ReferenceColumnName ";
+		fkQuery += " FROM ";
+		fkQuery += " sys.foreign_keys AS f ";
+		fkQuery += " INNER JOIN sys.foreign_key_columns AS fc ON f.OBJECT_ID = fc.constraint_object_id ";
+		fkQuery += " where OBJECT_NAME(f.parent_object_id) = '" +tb_name +"'";
+
+		List<string> fkColumnNames = new List<string>();
+		Dictionary<string, string> parentTables = new Dictionary<string, string>();
+	
+		SqlCommand command2 = new SqlCommand(fkQuery,conn);
+		using(var dr = command2.ExecuteReader())
+		{
+			while(dr.Read())
+			{
+				fkColumnNames.Add(dr["ColumnName"].ToString());
+				     if(!parentTables.Keys.Where(a=>a.Equals(dr["ColumnName"].ToString())).Any()){
+						parentTables.Add(dr["ColumnName"].ToString(), dr["ReferenceTableName"].ToString());
+                     }
+				
+			}
+			dr.Close();
+		}
+	
+		
+	
+
+		List<DataColumn> fkColumns = new List<DataColumn>();
+		foreach(string fkColumnName in fkColumnNames)
+		{
+			foreach (DataColumn dc in ds.Tables[0].Columns) 
+			{
+				if(dc.ColumnName == fkColumnName)
+					fkColumns.Add(dc);
+			}
+		}
+
+		List<string> primaryKeyParamsWithTypes = new List<string>();
+		List<string> primaryKeyParams = new List<string>();
+		List<string> whereItems = new List<string>();
+		List<string> automapItems = new List<string>();
+		foreach(DataColumn pk in ds.Tables[0].PrimaryKey)
+		{
+			primaryKeyParamsWithTypes.Add(string.Format("{0} {1}", pk.DataType.Name, this.ToCamelCase(pk.ColumnName)));
+			primaryKeyParams.Add(pk.ColumnName);
+			whereItems.Add(string.Format("{0} = @{1}", pk.ColumnName, pk.ColumnName.ToLower()));
+			automapItems.Add(string.Format("x.{0}", pk.ColumnName));
+		}
+
+		string updateAutomap = string.Empty;
+	if(automapItems.Count > 0){
+		if(automapItems.Count > 1)
+			updateAutomap = "new { " + string.Join(", ", automapItems.ToArray()) + " }";
+		else
+			updateAutomap = automapItems[0];
+			}
+		#>
+		  
+		#region <#=tb_name#>Name(Get)
+		/// <summary>
+		///获取 <#=tb_name#>Name
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseTotal<dynamic> Get(ApiPageBaseRequestModel<T> request)
+        {
+            var response = new ApiBaseResponseTotal<dynamic>();
+            if (!this.CheckUser(request, response, out UserRule user))
+                return response;
+            SampleIEService service = new SampleIEService();
+            return service.Get(request);
+        }
+		#endregion
+
+		#region <#=tb_name#>Name(Add)
+		/// <summary>
+        /// 增加基本工艺标准
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseModel Add([FromBody]ApiPageBaseRequestModel<<#=tb_name#>Model> request)
+        {
+            var response = new ApiBaseResponseModel();
+            if (!this.CheckUser(request, response, out UserRule user))
+                return response;
+            SampleIEService service = new SampleIEService();
+            return service.Add(request, user);
+        }
+		#endregion
+
+		#region <#=tb_name#>Name(Update)
+		/// <summary>
+        /// 编辑
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseModel Edit([FromBody]ApiPageBaseRequestModel<<#=tb_name#>Model> request)
+        {
+            var response = new ApiBaseResponseModel();
+            if (!this.CheckUser(request, response, out UserRule user))
+                return response;
+            SampleIEService service = new SampleIEService();
+            return service.Update(request, user);
+        }
+		#endregion
+
+		#region <#=tb_name#>Name(Delete)
+		 /// <summary>
+        /// 删除基本工艺标准
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseModel Del([FromBody]ApiBaseRequestModel<List<int>> request)
+        {
+            var response = new ApiBaseResponseModel();
+            if (!this.CheckUser(request, response, out UserRule user))
+                return response;
+            SampleIEService service = new SampleIEService();
+            return service.Delete(request);
+        }
+		#endregion
+
+		#region <#=tb_name#>Name(Copy)
+		/// <summary>
+        /// 复制
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseModel Copy([FromBody]ApiBaseRequestModel<int> request)
+        {
+            var response = new ApiBaseResponseModel();
+            if (!this.CheckUser(request, response, out UserRule user))
+                return response;
+            SampleIEService service = new SampleIEService();
+            return service.Copy(request);
+        }
+		#endregion
+
+	}
+	
+}
+	
+<#
+		manager.EndBlock();    
+         }            
+        conn.Close();  
+       manager.Process(true);  
+	    #> 
+
+
+
+<#+
+    public string ToCamelCase(string value)
+    {
+		if(string.IsNullOrEmpty(value)) 
+			return string.Empty;
+        
+		string firstLetter = value.Substring(0, 1);
+		string rest = value.Substring(1, value.Length - 1);
+		return firstLetter.ToLower() + rest;
+    }
+#>

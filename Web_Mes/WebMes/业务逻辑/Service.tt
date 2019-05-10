@@ -1,0 +1,374 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.xml" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Data" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+
+//  导入MultipleOutputHelper.ttinclude文件ce
+<#@ include file="..\MultipleOutputHelper.ttinclude" #>
+
+<#		
+		//生成单张表
+		var createname="MES_ProductionPlan";
+		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
+		SqlConnection conn = new SqlConnection(connectionString);
+		conn.Open();
+	
+		string selectQuery ="SET FMTONLY ON; select * from @tableName; SET FMTONLY OFF;";
+		SqlCommand command = new SqlCommand(selectQuery,conn);
+		SqlDataAdapter ad = new SqlDataAdapter(command);
+		System.Data.DataSet ds = new DataSet(); 
+  
+		var manager = Manager.Create(Host, GenerationEnvironment);  
+
+		System.Data.DataTable schema = conn.GetSchema("Tables");
+		//var datarow=schema.Select("TABLE_TYPE = 'BASE TABLE' ");
+		List<DataRow> datarow = new List<DataRow>();
+		//System.Data.DataRow[] datarow = null;
+		//var datarow=null;
+		if(!string.IsNullOrEmpty(createname)){
+			datarow=schema.Select( string.Format("TABLE_TYPE = 'BASE TABLE' and TABLE_NAME='{0}'",createname)).ToList();
+        }else{
+			datarow=schema.Select("TABLE_TYPE = 'BASE TABLE' ").ToList();
+        }
+		foreach(System.Data.DataRow row in datarow)
+		{	
+			ds.Tables.Clear();
+			string tb_name= row["TABLE_NAME"].ToString();		
+			command.CommandText = selectQuery.Replace("@tableName",row["TABLE_NAME"].ToString());
+			ad.FillSchema(ds, SchemaType.Mapped,tb_name);  
+			manager.StartNewFile(tb_name+"Service.cs");#>
+using FluentData;
+using FttCloud.Public.Database;
+using FttData.Api.App_Code;
+using FttData.Core;
+using FttData.Core.Rules;
+using FttData.Model.WEB.Base;
+using FttData.Model.WEB.<#=tb_name.Trim()#>Model;
+using System;
+using System.Collections.Generic;
+namespace FttData.Api.BLL.Service
+{	
+	/// <summary>
+    /// <#=tb_name#>Name 操作类
+    /// </summary>
+	public partial class <#=tb_name.Trim()#>Service
+	{<#
+		string fkQuery = " SELECT f.name AS ForeignKey,";
+		fkQuery += " OBJECT_NAME(f.parent_object_id) AS TableName, ";
+		fkQuery += " COL_NAME(fc.parent_object_id, fc.parent_column_id) AS ColumnName, ";
+		fkQuery += " OBJECT_NAME (f.referenced_object_id) AS ReferenceTableName, ";
+		fkQuery += " COL_NAME(fc.referenced_object_id, fc.referenced_column_id) AS ReferenceColumnName ";
+		fkQuery += " FROM ";
+		fkQuery += " sys.foreign_keys AS f ";
+		fkQuery += " INNER JOIN sys.foreign_key_columns AS fc ON f.OBJECT_ID = fc.constraint_object_id ";
+		fkQuery += " where OBJECT_NAME(f.parent_object_id) = '" +tb_name +"'";
+
+		List<string> fkColumnNames = new List<string>();
+		Dictionary<string, string> parentTables = new Dictionary<string, string>();
+	
+		SqlCommand command2 = new SqlCommand(fkQuery,conn);
+		using(var dr = command2.ExecuteReader())
+		{
+			while(dr.Read())
+			{
+				fkColumnNames.Add(dr["ColumnName"].ToString());
+				     if(!parentTables.Keys.Where(a=>a.Equals(dr["ColumnName"].ToString())).Any()){
+						parentTables.Add(dr["ColumnName"].ToString(), dr["ReferenceTableName"].ToString());
+                     }
+				
+			}
+			dr.Close();
+		}
+	
+		
+	
+
+		List<DataColumn> fkColumns = new List<DataColumn>();
+		foreach(string fkColumnName in fkColumnNames)
+		{
+			foreach (DataColumn dc in ds.Tables[0].Columns) 
+			{
+				if(dc.ColumnName == fkColumnName)
+					fkColumns.Add(dc);
+			}
+		}
+
+		List<string> primaryKeyParamsWithTypes = new List<string>();
+		List<string> primaryKeyParams = new List<string>();
+		List<string> whereItems = new List<string>();
+		List<string> automapItems = new List<string>();
+		foreach(DataColumn pk in ds.Tables[0].PrimaryKey)
+		{
+			primaryKeyParamsWithTypes.Add(string.Format("{0} {1}", pk.DataType.Name, this.ToCamelCase(pk.ColumnName)));
+			primaryKeyParams.Add(pk.ColumnName);
+			whereItems.Add(string.Format("{0} = @{1}", pk.ColumnName, pk.ColumnName.ToLower()));
+			automapItems.Add(string.Format("x.{0}", pk.ColumnName));
+		}
+
+		string updateAutomap = string.Empty;
+	if(automapItems.Count > 0){
+		if(automapItems.Count > 1)
+			updateAutomap = "new { " + string.Join(", ", automapItems.ToArray()) + " }";
+		else
+			updateAutomap = automapItems[0];
+			}
+		#>
+		  
+		#region <#=tb_name#>Name(Get)
+		/// <summary>
+		///获取 <#=tb_name#>Name
+        /// </summary>
+        /// <param name="request"></param>
+		/// <param name="T">根据条件自行修改，不能直接使用</param>
+        /// <returns></returns>
+        public ApiBaseResponseTotal<dynamic> Get(ApiPageBaseRequestModel<T> request)
+        {
+            var response = new ApiBaseResponseTotal<dynamic>();
+            try
+            {
+                var db = Db.getContext();
+                using (var command = db.NewContext().MultiResultSql)
+                {
+                   var sql = @"select * from <#=tb_name#> ";
+                    var sqlcount ="select  count(*) from <#=tb_name#>";
+                    #region Where添加条件
+                    //if(request.data...)
+                    //sql+=....
+                    //sqlcount+=wheresql;
+                    #endregion
+                    sql += $" order by ID  OFFSET ({request.PageIndex} - 1)  * {request.PageSize} rows fetch next {request.PageSize}  rows only;";
+                    var res = command.Sql(sql+sqlcount).QueryMany<dynamic>().ToArray();
+                    response.items = res;
+                    response.total = command.QuerySingle<int>();
+                }
+                response.success = true;
+            }
+            catch (Exception ex)
+            {
+                response.success = false;
+                response.message = ex.Message;
+            }
+            return response;
+        }
+		#endregion
+
+		#region <#=tb_name#>Name(Add)
+		/// <summary>
+        /// 增加基本工艺标准
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseModel Add(ApiPageBaseRequestModel<<#=tb_name#>Model> request)
+        {
+            var response = new ApiBaseResponseModel();
+            try
+            {
+                using (var db = Db.getContext().NewContext())
+                {
+                    using (var tran = db.UseTransaction(true))
+                    {
+						#region 逻辑操作
+                        //获取插入后id
+                        //int lastId = tran.Sql(@"Insert into <<#=tb_name#>(*,*,*,) Values (@*,@*,@*);").Parameter("*", request.data.*).ExecuteReturnLastId<int>();
+                        //如果有关联明细表则需要下面处理
+                        //foreach (var item in request.data.InsertDetail)
+                        //{
+                        //    item.Parent = chargeid;
+                        //    _insertDetail(tran, item);
+                        //}
+						#endregion
+                        tran.Commit();
+                        response.success = true;
+                    }
+
+                }
+
+
+                response.success = true;
+            }
+            catch (Exception ex)
+            {
+                response.success = false;
+                response.message = ex.Message;
+            }
+            return response;
+        }
+		#endregion
+
+		#region <#=tb_name#>Name(Update)
+		/// <summary>
+        /// 编辑
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseModel Update(ApiPageBaseRequestModel<<#=tb_name#>Model> request)
+        {
+            var response = new ApiBaseResponseModel();
+
+            try
+            {
+                using (var db = Db.getContext().NewContext())
+                {
+                    using (var tran = db.UseTransaction(true))
+                    {
+						#region 逻辑操作
+                         //过滤模型中不存在数据库表中的字段 必须否则会报错
+                        //int rowid = db.Update("<#=tb_name#>", request.data).AutoMap(x => x.ID, x => x.InsertDetail, x => x.DeleteDetail, x => x.UpdateDetail) .Where("ID", request.data.ID).Execute();
+                        //CRUD明细的增删改 
+                        //foreach (var item in request.InsertDetail)
+                        //{
+                        //    item.IEChargeID = request.ID;
+                        //    _insertDetail(tran, item);
+                        //}
+                        //foreach (var item in request.UpdateDetail)
+                        //{
+                        //    _updateDetail(tran, item);
+                        //}
+                        //foreach (var item in request.DeleteDetail)
+                        //{
+                        //    _delDetail(tran, item);
+                        //}
+						#endregion
+                        tran.Commit();
+                        response.success = true;
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                response.success = false;
+                response.message = ex.Message;
+            }
+            return response;
+        }
+		#endregion
+
+		#region <#=tb_name#>Name(Delete)
+		 /// <summary>
+        /// 删除基本工艺标准
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseModel Delete(ApiBaseRequestModel<List<int>> request)
+        {
+            var response = new ApiBaseResponseModel();
+
+            try
+            {
+                using (var db = Db.getContext().NewContext())
+                {
+                    using (var tran = db.UseTransaction(true))
+                    {
+                         foreach (var id in request.data)
+                        {
+                            #region 逻辑操作
+                            //如果有明显需要先删除明细
+                            //tran.Delete("MES_IEChargeDetail").Where("IEChargeID", request.data).Execute();
+							//删除
+                            tran.Delete("<#=tb_name#>").Where("ID", request.data).Execute();
+                            #endregion
+                        }
+                        tran.Commit();
+                        response.success = true;
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                response.success = false;
+                response.message = ex.Message;
+            }
+            return response;
+        }
+		#endregion
+
+		#region <#=tb_name#>Name(Copy)
+		/// <summary>
+        /// 复制
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseModel Copy(ApiBaseRequestModel<int> request)
+        {
+            var response = new ApiBaseResponseModel();
+            try
+            {
+                 var db = Db.getContext().NewContext();
+                //查询主表
+                var master = db.Sql("select * from <#=tb_name#> where id=@id").Parameter("id", request.data).QuerySingle<<#=tb_name#>Model>();
+                //如果有明细表则需要查询明细表
+                //var detial = db.Sql("select * from <#=tb_name#> where SampleIEID=@id").Parameter("id", request.data).QueryMany<<#=tb_name#>>();
+                using (var tran = db.UseTransaction(true))
+                {
+                    #region 逻辑处理
+                    //过滤模型中不存在数据库表中的字段 必须否则会报错
+                    //var lastID = db.Insert("<#=tb_name#>", master).AutoMap(x => x.ID, x => x.InserDetail, x => x.UpdateDetail, x => x.DeleteDetail)
+                    // .ExecuteReturnLastId<int>();
+                    //如果有明细则需要更新明细
+                    //foreach (var item in detial)
+                    //{
+                    //    item.SampleIEID = lastID;
+                    //    _insertDetail(tran, item);
+                    //}
+                    #endregion
+                    db.Commit();
+                    response.success = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.success = false;
+                response.message = ex.Message;
+            }
+            return response;
+        }
+		#endregion
+
+		//明细操作  如果不需要则注释
+		#region 裁断明细 增删改方法组
+        private void _insertDetail(IDbContext tran, <#=tb_name#>Model detail)
+        {
+            tran.Insert("<#=tb_name#>", detail).AutoMap(x => x.ID).Execute();
+        }
+        private void _updateDetail(IDbContext tran, <#=tb_name#>Model detail)
+        {
+            tran.Update("<#=tb_name#>", detail).AutoMap(x => x.ID).Where("ID", detail.ID).Execute();
+        }
+        private void _delDetail(IDbContext tran, <#=tb_name#>Model detail)
+        {
+            tran.Delete("<#=tb_name#>").Where("ID", detail.ID).Execute();
+        }
+        #endregion
+
+	}
+	
+}
+	
+<#
+		manager.EndBlock();    
+         }            
+        conn.Close();  
+       manager.Process(true);  
+	    #> 
+
+
+
+<#+
+    public string ToCamelCase(string value)
+    {
+		if(string.IsNullOrEmpty(value)) 
+			return string.Empty;
+        
+		string firstLetter = value.Substring(0, 1);
+		string rest = value.Substring(1, value.Length - 1);
+		return firstLetter.ToLower() + rest;
+    }
+#>
