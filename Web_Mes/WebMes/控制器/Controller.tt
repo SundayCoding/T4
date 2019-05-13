@@ -119,6 +119,7 @@ namespace FttData.Api.Controllers.VersionWEB
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+		[HttpPost]
         public ApiBaseResponseTotal<dynamic> Get(ApiPageBaseRequestModel<Parameters> request)
         {
             var response = new ApiBaseResponseTotal<dynamic>();
@@ -135,7 +136,8 @@ namespace FttData.Api.Controllers.VersionWEB
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ApiBaseResponseModel Add([FromBody]ApiPageBaseRequestModel<<#=tb_name#>Model> request)
+        [HttpPost]
+		public ApiBaseResponseModel Add([FromBody]ApiPageBaseRequestModel<<#=tb_name#>Model> request)
         {
             var response = new ApiBaseResponseModel();
             if (!this.CheckUser(request, response, out UserRule user))
@@ -151,6 +153,7 @@ namespace FttData.Api.Controllers.VersionWEB
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+		[HttpPost]
         public ApiBaseResponseModel Edit([FromBody]ApiPageBaseRequestModel<<#=tb_name#>Model> request)
         {
             var response = new ApiBaseResponseModel();
@@ -167,6 +170,7 @@ namespace FttData.Api.Controllers.VersionWEB
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+		[HttpPost]
         public ApiBaseResponseModel Del([FromBody]ApiBaseRequestModel<List<int>> request)
         {
             var response = new ApiBaseResponseModel();
@@ -183,6 +187,7 @@ namespace FttData.Api.Controllers.VersionWEB
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+		[HttpPost]
         public ApiBaseResponseModel Copy([FromBody]ApiBaseRequestModel<int> request)
         {
             var response = new ApiBaseResponseModel();
