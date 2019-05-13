@@ -38,6 +38,12 @@
 			command.CommandText = selectQuery.Replace("@tableName",row["TABLE_NAME"].ToString());
 			ad.FillSchema(ds, SchemaType.Mapped,tb_name);  
 			manager.StartNewFile(tb_name+"Controller.cs");#>
+/**
+*本页面有T4模板自动生成
+*注意代码被覆盖
+*<#=DateTime.Now#>
+*
+*/
 using FttData.Core;
 using FttData.Core.Rules;
 using FttData.Model.WEB.Base;
@@ -45,6 +51,7 @@ using FttData.Model.WEB.<#=tb_name.Trim()#>Model;
 using System.Collections.Generic;
 using System.Web.Http;
 using FttData.Api.BLL.Service;
+using FttData.Api.BLL.Base;
 namespace FttData.Api.Controllers.VersionWEB
 {	
 	/// <summary>
@@ -137,7 +144,7 @@ namespace FttData.Api.Controllers.VersionWEB
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-		public ApiBaseResponseModel Add([FromBody]ApiPageBaseRequestModel<<#=tb_name#>Model> request)
+		public ApiBaseResponseModel Add([FromBody]ApiPageBaseRequestModel<<#=tb_name#>> request)
         {
             var response = new ApiBaseResponseModel();
             if (!this.CheckUser(request, response, out UserRule user))
@@ -154,7 +161,7 @@ namespace FttData.Api.Controllers.VersionWEB
         /// <param name="request"></param>
         /// <returns></returns>
 		[HttpPost]
-        public ApiBaseResponseModel Edit([FromBody]ApiPageBaseRequestModel<<#=tb_name#>Model> request)
+        public ApiBaseResponseModel Edit([FromBody]ApiPageBaseRequestModel<<#=tb_name#>> request)
         {
             var response = new ApiBaseResponseModel();
             if (!this.CheckUser(request, response, out UserRule user))
@@ -197,6 +204,31 @@ namespace FttData.Api.Controllers.VersionWEB
             return service.Copy(request);
         }
 		#endregion
+
+		 #region ComboxStore
+        /// <summary>
+        /// 获取页面加载ComBox集合
+		/// 这里是一次性加载页面所有用到的,如果需要用到带有条件的则修改ApiBaseRequestModel，添加参数类型
+        /// </summary>
+        /// <param name="request">只带token和timestamp</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiBaseResponseModel<Dictionary<string,dynamic>> getComboxStore(ApiBaseRequestModel request)
+        {
+
+            var response = new ApiBaseResponseModel<Dictionary<string, dynamic>>();
+            if (!this.CheckUser(request, response, out UserRule user))
+                return response;
+            var dic = new Dictionary<string, dynamic>();
+            ComboService service = new ComboService();
+			//把需要用到的combox 添加进去
+           // dic.Add("FactoryStore", service.GetFactoryStore());
+		    response.success = true;
+            response.data = dic;
+            return response;
+        }
+
+        #endregion
 
 	}
 	

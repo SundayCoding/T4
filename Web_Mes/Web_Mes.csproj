@@ -42,7 +42,7 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WebMes\Model\MES_ProductionPlanModle.cs">
+    <Compile Include="WebMes\Model\MES_ProductionPlanDetailModle.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="WebMes\Model\Model2.cs">

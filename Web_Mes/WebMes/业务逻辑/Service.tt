@@ -41,6 +41,12 @@
 			command.CommandText = selectQuery.Replace("@tableName",row["TABLE_NAME"].ToString());
 			ad.FillSchema(ds, SchemaType.Mapped,tb_name);  
 			manager.StartNewFile(tb_name+"Service.cs");#>
+/**
+*本页面有T4模板自动生成
+*注意代码被覆盖
+*05/13/2019 15:07:11
+*
+*/
 using FluentData;
 using FttCloud.Public.Database;
 using FttData.Core;
@@ -181,7 +187,7 @@ namespace FttData.Api.BLL.Service
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ApiBaseResponseModel Add(ApiPageBaseRequestModel<<#=tb_name#>Model> request)
+        public ApiBaseResponseModel Add(ApiPageBaseRequestModel<<#=tb_name#>> request)
         {
             var response = new ApiBaseResponseModel();
             try
@@ -192,7 +198,7 @@ namespace FttData.Api.BLL.Service
                     {
 						#region 逻辑操作
                         //获取插入后id
-                        //int lastId = tran.Sql(@"Insert into <<#=tb_name#>(*,*,*,) Values (@*,@*,@*);").Parameter("*", request.data.*).ExecuteReturnLastId<int>();
+                        // int lastID = tran.Insert("<#=tb_name#>", request.data).AutoMap(a => a.ID, a => a.InsterDetail, a => a.DeleteDetail, a => a.UpdateDetail).ExecuteReturnLastId<int>();
                         //如果有关联明细表则需要下面处理
                         //foreach (var item in request.data.InsertDetail)
                         //{
@@ -224,7 +230,7 @@ namespace FttData.Api.BLL.Service
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ApiBaseResponseModel Update(ApiPageBaseRequestModel<<#=tb_name#>Model> request)
+        public ApiBaseResponseModel Update(ApiPageBaseRequestModel<<#=tb_name#>> request)
         {
             var response = new ApiBaseResponseModel();
 
@@ -243,11 +249,11 @@ namespace FttData.Api.BLL.Service
                         //    item.IEChargeID = request.ID;
                         //    _insertDetail(tran, item);
                         //}
-                        //foreach (var item in request.UpdateDetail)
+                        //foreach (var item in request.data.UpdateDetail)
                         //{
                         //    _updateDetail(tran, item);
                         //}
-                        //foreach (var item in request.DeleteDetail)
+                        //foreach (var item in request.data.DeleteDetail)
                         //{
                         //    _delDetail(tran, item);
                         //}
@@ -322,14 +328,14 @@ namespace FttData.Api.BLL.Service
             {
                  var db = Db.getContext().NewContext();
                 //查询主表
-                var master = db.Sql("select * from <#=tb_name#> where id=@id").Parameter("id", request.data).QuerySingle<<#=tb_name#>Model>();
+                var master = db.Sql("select * from <#=tb_name#> where id=@id").Parameter("id", request.data).QuerySingle<<#=tb_name#>>();
                 //如果有明细表则需要查询明细表
                 //var detial = db.Sql("select * from <#=tb_name#> where SampleIEID=@id").Parameter("id", request.data).QueryMany<<#=tb_name#>>();
                 using (var tran = db.UseTransaction(true))
                 {
                     #region 逻辑处理
                     //过滤模型中不存在数据库表中的字段 必须否则会报错
-                    //var lastID = db.Insert("<#=tb_name#>", master).AutoMap(x => x.ID, x => x.InserDetail, x => x.UpdateDetail, x => x.DeleteDetail)
+                    //var lastID = db.Insert("<#=tb_name#>", master).AutoMap(x => x.ID, x => x.InsertDetail, x => x.UpdateDetail, x => x.DeleteDetail)
                     // .ExecuteReturnLastId<int>();
                     //如果有明细则需要更新明细
                     //foreach (var item in detial)
@@ -353,15 +359,15 @@ namespace FttData.Api.BLL.Service
 
 		//明细操作  如果不需要则注释
 		#region 裁断明细 增删改方法组
-        private void _insertDetail(IDbContext tran, <#=tb_name#>Model detail)
+        private void _insertDetail(IDbContext tran, <#=tb_name#> detail)
         {
             tran.Insert("<#=tb_name#>", detail).AutoMap(x => x.ID).Execute();
         }
-        private void _updateDetail(IDbContext tran, <#=tb_name#>Model detail)
+        private void _updateDetail(IDbContext tran, <#=tb_name#> detail)
         {
             tran.Update("<#=tb_name#>", detail).AutoMap(x => x.ID).Where("ID", detail.ID).Execute();
         }
-        private void _delDetail(IDbContext tran, <#=tb_name#>Model detail)
+        private void _delDetail(IDbContext tran, <#=tb_name#> detail)
         {
             tran.Delete("<#=tb_name#>").Where("ID", detail.ID).Execute();
         }

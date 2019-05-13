@@ -12,7 +12,7 @@
 
 <#		
 		//生成单张表
-		var createname="MES_ProductionPlan";
+		var createname="MES_ProductionPlanDetail";
 		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
 		SqlConnection conn = new SqlConnection(connectionString);
 		conn.Open();
@@ -37,9 +37,15 @@
 			command.CommandText = selectQuery.Replace("@tableName",row["TABLE_NAME"].ToString());
 			ad.FillSchema(ds, SchemaType.Mapped,tb_name);  
 			manager.StartNewFile(tb_name+"Modle.cs");#>
+/**
+*本页面有T4模板自动生成
+*注意代码被覆盖
+*05/13/2019 15:07:11
+*
+*/
 using System;
 using System.Collections.Generic;
-namespace FttData.Model.WEB.<#=tb_name#>Model  
+namespace FttData.Model.WEB.<#=tb_name#> Model
 {	
 	#region 查询模板
 	/// <summary>
@@ -54,7 +60,7 @@ namespace FttData.Model.WEB.<#=tb_name#>Model
 	/// <summary>
 	/// 实体-<#=tb_name#>_Name 
 	/// </summary>
-	public partial class <#=tb_name#>Model    
+	public partial class <#=tb_name#>    
 	{	
 		<#
 		PushIndent("");
