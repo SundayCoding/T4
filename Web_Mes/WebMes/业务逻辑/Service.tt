@@ -12,7 +12,7 @@
 
 <#		
 		//生成单张表
-		var createname="MES_ProductionPlan";
+		var createname="Factory";
 		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
 		SqlConnection conn = new SqlConnection(connectionString);
 		conn.Open();
@@ -150,7 +150,7 @@ namespace FttData.Api.BLL.Service
         /// <param name="request"></param>
 		/// <param name="T">根据条件自行修改，不能直接使用</param>
         /// <returns></returns>
-        public ApiBaseResponseTotal<dynamic> Get(ApiPageBaseRequestModel<Parameters> request)
+        public ApiBaseResponseTotal<dynamic> Get(ApiPageBaseRequestModel<<#=tb_name#>Parameters> request)
         {
             var response = new ApiBaseResponseTotal<dynamic>();
             try
@@ -296,7 +296,7 @@ namespace FttData.Api.BLL.Service
                             //如果有明显需要先删除明细
                             //tran.Delete("MES_IEChargeDetail").Where("IEChargeID", request.data).Execute();
 							//删除
-                            tran.Delete("<#=tb_name#>").Where("ID", request.data).Execute();
+                            tran.Delete("<#=tb_name#>").Where("ID", id).Execute();
                             #endregion
                         }
                         tran.Commit();

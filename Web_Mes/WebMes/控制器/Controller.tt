@@ -12,7 +12,7 @@
 
 <#		
 		//生成单张表
-		var createname="MES_ProductionPlan";
+		var createname="Factory";
 		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
 		SqlConnection conn = new SqlConnection(connectionString);
 		conn.Open();
@@ -127,7 +127,7 @@ namespace FttData.Api.Controllers.VersionWEB
         /// <param name="request"></param>
         /// <returns></returns>
 		[HttpPost]
-        public ApiBaseResponseTotal<dynamic> Get(ApiPageBaseRequestModel<Parameters> request)
+        public ApiBaseResponseTotal<dynamic> Get(ApiPageBaseRequestModel< <#=tb_name#>Parameters> request)
         {
             var response = new ApiBaseResponseTotal<dynamic>();
             if (!this.CheckUser(request, response, out UserRule user))
