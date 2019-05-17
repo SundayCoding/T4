@@ -42,6 +42,11 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebMes\JSON\JSON.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>JSON.tt</DependentUpon>
+    </Compile>
     <Compile Include="WebMes\Model\FactoryModle.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -68,9 +73,16 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="WebMes\JSON\FactoryJSON.json">
+      <DependentUpon>JSON.tt</DependentUpon>
+    </None>
     <None Include="WebMes\MultipleOutputHelper.ttinclude" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="WebMes\JSON\JSON.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>JSON.cs</LastGenOutput>
+    </Content>
     <Content Include="WebMes\Model\Model.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Model2.cs</LastGenOutput>

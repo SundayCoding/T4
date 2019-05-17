@@ -1,0 +1,66 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.xml" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Data" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ include file="..\MultipleOutputHelper.ttinclude" #>
+//  导入MultipleOutputHelper.ttinclude文件
+//C:\Users\Administrator\Desktop\qqZeng.Model\T4\MultipleOutputHelper.ttinclude
+
+<#		
+		//生成单张表
+		var createname="Factory";
+		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
+		SqlConnection conn = new SqlConnection(connectionString);
+		conn.Open();
+	
+		string selectQuery ="SET FMTONLY ON; select * from @tableName; SET FMTONLY OFF;";
+		SqlCommand command = new SqlCommand(selectQuery,conn);
+		SqlDataAdapter ad = new SqlDataAdapter(command);
+		System.Data.DataSet ds = new DataSet(); 
+  
+		var manager = Manager.Create(Host, GenerationEnvironment);  
+		System.Data.DataTable schema = conn.GetSchema("Tables");
+			List<DataRow> datarow = new List<DataRow>();
+		if(!string.IsNullOrEmpty(createname)){
+			datarow=schema.Select( string.Format("TABLE_TYPE = 'BASE TABLE' and TABLE_NAME='{0}'",createname)).ToList();
+        }else{
+			datarow=schema.Select("TABLE_TYPE = 'BASE TABLE' ").ToList();
+        }
+		foreach(System.Data.DataRow row in datarow)
+		{	
+			ds.Tables.Clear();
+			string tb_name= row["TABLE_NAME"].ToString();		
+			command.CommandText = selectQuery.Replace("@tableName",row["TABLE_NAME"].ToString());
+			ad.FillSchema(ds, SchemaType.Mapped,tb_name);  
+			manager.StartNewFile(tb_name+"JSON.json");#>
+/**
+*本页面有T4模板自动生成
+*注意代码被覆盖
+*05/13/2019 15:07:11
+*
+*/
+
+[	
+		<#
+		PushIndent("");
+		foreach (DataColumn dc in ds.Tables[0].Columns) 
+		{
+		#>
+		<#  
+				var str="{ type:'input',label:'" + dc.ColumnName + "',placeholder:'"+dc.ColumnName+"',prop:'"+dc.ColumnName+"',disabled: true  },";
+				WriteLine(str);
+		}
+		PopIndent();
+		#>
+]
+	
+<#
+		manager.EndBlock();    
+ }            
+        conn.Close();  
+       manager.Process(true);  
+	    #> 

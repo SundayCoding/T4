@@ -5,3 +5,4 @@
 /Web_Mes/WebMes/Model/*.cs
 /Web_Mes/WebMes/控制器/*.cs
 /Web_Mes/WebMes/业务逻辑/*.cs
+/Web_Mes/WebMes/JSON/*.json
