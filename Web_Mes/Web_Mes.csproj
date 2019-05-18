@@ -47,7 +47,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>JSON.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\Model\FactoryModle.cs">
+    <Compile Include="WebMes\Model\FactoryWorkSectionModle.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="WebMes\Model\Model2.cs">
@@ -68,7 +68,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Controller.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\控制器\FactoryController.cs">
+    <Compile Include="WebMes\控制器\FactoryWarehouseController.cs">
       <DependentUpon>Controller.tt</DependentUpon>
     </Compile>
   </ItemGroup>
