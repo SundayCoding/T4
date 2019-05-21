@@ -12,7 +12,7 @@
 
 <#		
 		//生成单张表
-		var createname="FactoryWarehouse";
+		var createname="OrderDocImport";
 		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
 		SqlConnection conn = new SqlConnection(connectionString);
 		conn.Open();
@@ -38,10 +38,11 @@
 			command.CommandText = selectQuery.Replace("@tableName",row["TABLE_NAME"].ToString());
 			ad.FillSchema(ds, SchemaType.Mapped,tb_name);  
 			manager.StartNewFile(tb_name+"Controller.cs");#>
-/**
-*本页面有T4模板自动生成
-*注意代码被覆盖
-*<#=DateTime.Now#>
+/*
+*
+*Author:		<zhangby>
+*Create date:   <<#=DateTime.Now#>>
+*Description:	本页面有T4模板自动生成,注意代码被覆盖
 *
 */
 using FttData.Core;

@@ -47,15 +47,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>JSON.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\Model\FactoryWorkSectionModle.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
     <Compile Include="WebMes\Model\Model2.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\业务逻辑\FactoryService.cs">
+    <Compile Include="WebMes\Model\OrderDocImportModle.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WebMes\业务逻辑\OrderDocImportService.cs">
       <DependentUpon>Service.tt</DependentUpon>
     </Compile>
     <Compile Include="WebMes\业务逻辑\Service2.cs">
@@ -68,12 +68,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Controller.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\控制器\FactoryWarehouseController.cs">
+    <Compile Include="WebMes\控制器\OrderDocImportController.cs">
       <DependentUpon>Controller.tt</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="WebMes\JSON\FactoryJSON.json">
+    <None Include="WebMes\JSON\OrderDocImportJSON.json">
       <DependentUpon>JSON.tt</DependentUpon>
     </None>
     <None Include="WebMes\MultipleOutputHelper.ttinclude" />
