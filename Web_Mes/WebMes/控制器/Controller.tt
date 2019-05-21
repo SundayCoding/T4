@@ -231,6 +231,50 @@ namespace FttData.Api.Controllers.VersionWEB
 
         #endregion
 
+		#region <#=tb_name#>_Name明细（增,删，查）
+        /// <summary>
+        /// 根据生产订单ID获取生产订单明细
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost] 
+	    public ApiBaseResponseTotal<dynamic> Get<#=tb_name#>DetailBy<#=tb_name#>ID(ApiPageBaseRequestModel<int> request)
+        {
+            var response = new ApiBaseResponseTotal<dynamic>();
+            if (!this.CheckUser(request, response, out UserRule user))
+                return response;
+            OrderDocImportService service = new OrderDocImportService(user);
+            return service.Get<#=tb_name#>DetailBy<#=tb_name#>ID(request);
+        }
+        /// <summary>
+        /// 添加生产订单明细
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiBaseResponseModel Add<#=tb_name#>Detail([FromBody]ApiBaseRequestModel<List<<#=tb_name#>Detail>> request)
+        {
+            var response = new ApiBaseResponseModel();
+            if (!this.CheckUser(request, response, out UserRule user))
+                return response;
+            OrderDocImportService service = new OrderDocImportService(user);
+            return service.Add<#=tb_name#>Detail(request);
+        }
+        /// <summary>
+        /// 删除生产订单明细
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiBaseResponseModel Del<#=tb_name#>DetailByIDs([FromBody]ApiBaseRequestModel<List<int>> request)
+        {
+            var response = new ApiBaseResponseModel();
+            if (!this.CheckUser(request, response, out UserRule user))
+                return response;
+            OrderDocImportService service = new OrderDocImportService(user);
+            return service.Del<#=tb_name#>DetailByIDs(request);
+        }
+        #endregion
 	}
 	
 }

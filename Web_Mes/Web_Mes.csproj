@@ -52,7 +52,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\Model\OrderDocImportModle.cs">
+    <Compile Include="WebMes\Model\OrderDocImportDetailModle.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="WebMes\业务逻辑\OrderDocImportService.cs">

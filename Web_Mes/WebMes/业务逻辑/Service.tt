@@ -56,6 +56,7 @@ using FttData.Model.WEB.Base;
 using FttData.Model.WEB.<#=tb_name.Trim()#>Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 namespace FttData.Api.BLL.Service
 {	
 	/// <summary>
@@ -197,13 +198,14 @@ namespace FttData.Api.BLL.Service
                 {
                     using (var tran = db.UseTransaction(true))
                     {
+						var model = request.data;
 						#region 逻辑操作
                         //获取插入后id
-                        // int lastID = tran.Insert("<#=tb_name#>", request.data).AutoMap(a => a.ID, a => a.InsterDetail, a => a.DeleteDetail, a => a.UpdateDetail).ExecuteReturnLastId<int>();
+                        // int lastID = tran.Insert("<#=tb_name#>", model).AutoMap(a => a.ID, a => a.<#=tb_name#>DetailList).ExecuteReturnLastId<int>();
                         //如果有关联明细表则需要下面处理
-                        //foreach (var item in request.data.InsertDetail)
+                        //foreach (var item in model.<#=tb_name#>DetailList)
                         //{
-                        //    item.Parent = chargeid;
+                        //    item.<#=tb_name#>ID = lastID;
                         //    _insertDetail(tran, item);
                         //}
 						#endregion
@@ -241,22 +243,19 @@ namespace FttData.Api.BLL.Service
                 {
                     using (var tran = db.UseTransaction(true))
                     {
+						var model = request.data;
 						#region 逻辑操作
-                         //过滤模型中不存在数据库表中的字段 必须否则会报错
-                        //int rowid = db.Update("<#=tb_name#>", request.data).AutoMap(x => x.ID, x => x.InsertDetail, x => x.DeleteDetail, x => x.UpdateDetail) .Where("ID", request.data.ID).Execute();
+                        //过滤模型中不存在数据库表中的字段 必须否则会报错
+                        // db.Update("<#=tb_name#>", model).AutoMap(x => x.ID,, x => x.<#=tb_name#>DetailList) .Where("ID",model.ID).Execute();
                         //CRUD明细的增删改 
-                        //foreach (var item in request.InsertDetail)
+                        //foreach (var item in model.<#=tb_name#>DetailList.Where(a=>a.ID==0))
                         //{
-                        //    item.IEChargeID = request.ID;
+                        //    item.<#=tb_name#>ID = model.ID;
                         //    _insertDetail(tran, item);
                         //}
-                        //foreach (var item in request.data.UpdateDetail)
+                        //foreach (var item in model.<#=tb_name#>DetailList.Where(a => a.ID> 0))
                         //{
                         //    _updateDetail(tran, item);
-                        //}
-                        //foreach (var item in request.data.DeleteDetail)
-                        //{
-                        //    _delDetail(tran, item);
                         //}
 						#endregion
                         tran.Commit();
@@ -295,7 +294,7 @@ namespace FttData.Api.BLL.Service
                         {
                             #region 逻辑操作
                             //如果有明显需要先删除明细
-                            //tran.Delete("MES_IEChargeDetail").Where("IEChargeID", request.data).Execute();
+                            //tran.Delete("<#=tb_name#>Detail").Where("<#=tb_name#>ID", request.data).Execute();
 							//删除
                             tran.Delete("<#=tb_name#>").Where("ID", id).Execute();
                             #endregion
@@ -331,17 +330,16 @@ namespace FttData.Api.BLL.Service
                 //查询主表
                 var master = db.Sql("select * from <#=tb_name#> where id=@id").Parameter("id", request.data).QuerySingle<<#=tb_name#>>();
                 //如果有明细表则需要查询明细表
-                //var detial = db.Sql("select * from <#=tb_name#> where SampleIEID=@id").Parameter("id", request.data).QueryMany<<#=tb_name#>>();
+                //var detial = db.Sql("select * from <#=tb_name#>Detail where <#=tb_name#>ID=@id").Parameter("id", request.data).QueryMany<<#=tb_name#>Detail>();
                 using (var tran = db.UseTransaction(true))
                 {
                     #region 逻辑处理
                     //过滤模型中不存在数据库表中的字段 必须否则会报错
-                    //var lastID = db.Insert("<#=tb_name#>", master).AutoMap(x => x.ID, x => x.InsertDetail, x => x.UpdateDetail, x => x.DeleteDetail)
-                    // .ExecuteReturnLastId<int>();
+                    //var lastID = db.Insert("<#=tb_name#>", master).AutoMap(x => x.ID).ExecuteReturnLastId<int>();
                     //如果有明细则需要更新明细
                     //foreach (var item in detial)
                     //{
-                    //    item.SampleIEID = lastID;
+                    //    item.<#=tb_name#>ID = lastID;
                     //    _insertDetail(tran, item);
                     //}
                     #endregion
@@ -359,20 +357,103 @@ namespace FttData.Api.BLL.Service
 		#endregion
 
 		//明细操作  如果不需要则注释
-		#region 裁断明细 增删改方法组
-        private void _insertDetail(IDbContext tran, <#=tb_name#> detail)
+		#region <#=tb_name#>_Name明细 增删改方法组
+        private void _insertDetail(IDbContext db, <#=tb_name#> entity)
         {
-            tran.Insert("<#=tb_name#>", detail).AutoMap(x => x.ID).Execute();
+            db.Insert("<#=tb_name#>", entity).AutoMap(x => x.ID).Execute();
         }
-        private void _updateDetail(IDbContext tran, <#=tb_name#> detail)
+        private void _updateDetail(IDbContext db, <#=tb_name#> entity)
         {
-            tran.Update("<#=tb_name#>", detail).AutoMap(x => x.ID).Where("ID", detail.ID).Execute();
+            db.Update("<#=tb_name#>", entity).AutoMap(x => x.ID).Where("ID", entity.ID).Execute();
         }
-        private void _delDetail(IDbContext tran, <#=tb_name#> detail)
+        private void _delDetail(IDbContext db, <#=tb_name#> entity)
         {
-            tran.Delete("<#=tb_name#>").Where("ID", detail.ID).Execute();
+            db.Delete("<#=tb_name#>").Where("ID", entity.ID).Execute();
         }
         #endregion
+
+
+		   #region <#=tb_name#>_Name明细（增,删,查）
+        /// <summary>
+        /// <#=tb_name#>_Name明细 获取 根据<#=tb_name#>_NameID
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseTotal<dynamic> Get<#=tb_name#>DetailBy<#=tb_name#>ID(ApiPageBaseRequestModel<int> request)
+        {
+            var response = new ApiBaseResponseTotal<dynamic>();
+            try
+            {
+                var sql = $"SELECT * FROM <#=tb_name#>  WHERE <#=tb_name#>ID = {request.data} order by ID";
+                sql += $"   OFFSET ({request.PageIndex} - 1)  * {request.PageSize} rows fetch next {request.PageSize}  rows only;";
+                var db = Db.getContext().NewContext();
+                using (var command = db.MultiResultSql)
+                {
+                    response.items = command.Sql(sql + "select count(*) from <#=tb_name#> where <#=tb_name#>ID=@<#=tb_name#>ID;").Parameter("<#=tb_name#>ID", request.data).QueryMany<dynamic>().ToArray();
+                    response.total = command.QuerySingle<int>();
+                }
+
+                response.success = true;
+            }
+            catch (Exception ex)
+            {
+                response.success = false;
+                response.message = ex.Message;
+            }
+            return response;
+        }
+        /// <summary>
+        /// 删除  <#=tb_name#>_Name明细
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseModel Del<#=tb_name#>DetailByID(ApiBaseRequestModel<List<int>> request)
+        {
+            var response = new ApiBaseResponseModel();
+            try
+            {
+                var db = Db.getContext().NewContext();
+                foreach (var id in request.data)
+                {
+                    _delDetail(db, new <#=tb_name#>Detail() { ID = id });
+                }
+                response.success = true;
+            }
+            catch (Exception ex)
+            {
+                response.success = false;
+                response.message = ex.Message;
+            }
+            return response;
+        }
+
+        /// <summary>
+        /// 添加  <#=tb_name#>_Name明细
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseModel Add<#=tb_name#>Detail(ApiBaseRequestModel<List<<#=tb_name#>Detail>> request)
+        {
+            var response = new ApiBaseResponseModel();
+            try
+            {
+                var db = Db.getContext().NewContext();
+                foreach (var item in request.data)
+                {
+                    _insertDetail(db, item);
+                }
+                response.success = true;
+            }
+            catch (Exception ex)
+            {
+                response.success = false;
+                response.message = ex.Message;
+            }
+            return response;
+        }
+
+        #endregion
+
 
 	}
 	
