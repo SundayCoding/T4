@@ -47,15 +47,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>JSON.tt</DependentUpon>
     </Compile>
+    <Compile Include="WebMes\Model\MES_ProcessDetailModle.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="WebMes\Model\Model2.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\Model\OrderDocImportDetailModle.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="WebMes\业务逻辑\OrderDocImportService.cs">
+    <Compile Include="WebMes\业务逻辑\MES_ProcessService.cs">
       <DependentUpon>Service.tt</DependentUpon>
     </Compile>
     <Compile Include="WebMes\业务逻辑\Service2.cs">
@@ -68,7 +68,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Controller.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\控制器\OrderDocImportController.cs">
+    <Compile Include="WebMes\控制器\MES_ProcessController.cs">
       <DependentUpon>Controller.tt</DependentUpon>
     </Compile>
   </ItemGroup>

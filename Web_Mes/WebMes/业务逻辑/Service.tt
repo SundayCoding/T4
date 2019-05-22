@@ -12,7 +12,7 @@
 
 <#		
 		//生成单张表
-		var createname="OrderDocImport";
+		var createname="MES_Process";
 		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
 		SqlConnection conn = new SqlConnection(connectionString);
 		conn.Open();
@@ -246,7 +246,7 @@ namespace FttData.Api.BLL.Service
 						var model = request.data;
 						#region 逻辑操作
                         //过滤模型中不存在数据库表中的字段 必须否则会报错
-                        // db.Update("<#=tb_name#>", model).AutoMap(x => x.ID,, x => x.<#=tb_name#>DetailList) .Where("ID",model.ID).Execute();
+                        // db.Update("<#=tb_name#>", model).AutoMap(x => x.ID, x => x.<#=tb_name#>DetailList) .Where("ID",model.ID).Execute();
                         //CRUD明细的增删改 
                         //foreach (var item in model.<#=tb_name#>DetailList.Where(a=>a.ID==0))
                         //{
@@ -294,7 +294,7 @@ namespace FttData.Api.BLL.Service
                         {
                             #region 逻辑操作
                             //如果有明显需要先删除明细
-                            //tran.Delete("<#=tb_name#>Detail").Where("<#=tb_name#>ID", request.data).Execute();
+                            //tran.Delete("<#=tb_name#>Detail").Where("<#=tb_name#>ID", id).Execute();
 							//删除
                             tran.Delete("<#=tb_name#>").Where("ID", id).Execute();
                             #endregion
@@ -358,17 +358,17 @@ namespace FttData.Api.BLL.Service
 
 		//明细操作  如果不需要则注释
 		#region <#=tb_name#>_Name明细 增删改方法组
-        private void _insertDetail(IDbContext db, <#=tb_name#> entity)
+        private void _insertDetail(IDbContext db, <#=tb_name#>Detail entity)
         {
-            db.Insert("<#=tb_name#>", entity).AutoMap(x => x.ID).Execute();
+            db.Insert("<#=tb_name#>Detail", entity).AutoMap(x => x.ID).Execute();
         }
-        private void _updateDetail(IDbContext db, <#=tb_name#> entity)
+        private void _updateDetail(IDbContext db, <#=tb_name#>Detail entity)
         {
-            db.Update("<#=tb_name#>", entity).AutoMap(x => x.ID).Where("ID", entity.ID).Execute();
+            db.Update("<#=tb_name#>Detail", entity).AutoMap(x => x.ID).Where("ID", entity.ID).Execute();
         }
-        private void _delDetail(IDbContext db, <#=tb_name#> entity)
+        private void _delDetail(IDbContext db, <#=tb_name#>Detail entity)
         {
-            db.Delete("<#=tb_name#>").Where("ID", entity.ID).Execute();
+            db.Delete("<#=tb_name#>Detail").Where("ID", entity.ID).Execute();
         }
         #endregion
 
@@ -384,12 +384,12 @@ namespace FttData.Api.BLL.Service
             var response = new ApiBaseResponseTotal<dynamic>();
             try
             {
-                var sql = $"SELECT * FROM <#=tb_name#>  WHERE <#=tb_name#>ID = {request.data} order by ID";
+                var sql = $"SELECT * FROM <#=tb_name#>Detail  WHERE <#=tb_name#>ID = {request.data} order by ID";
                 sql += $"   OFFSET ({request.PageIndex} - 1)  * {request.PageSize} rows fetch next {request.PageSize}  rows only;";
                 var db = Db.getContext().NewContext();
                 using (var command = db.MultiResultSql)
                 {
-                    response.items = command.Sql(sql + "select count(*) from <#=tb_name#> where <#=tb_name#>ID=@<#=tb_name#>ID;").Parameter("<#=tb_name#>ID", request.data).QueryMany<dynamic>().ToArray();
+                    response.items = command.Sql(sql + "select count(*) from <#=tb_name#>Detail where <#=tb_name#>ID=@<#=tb_name#>ID;").Parameter("<#=tb_name#>ID", request.data).QueryMany<dynamic>().ToArray();
                     response.total = command.QuerySingle<int>();
                 }
 
@@ -407,7 +407,7 @@ namespace FttData.Api.BLL.Service
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ApiBaseResponseModel Del<#=tb_name#>DetailByID(ApiBaseRequestModel<List<int>> request)
+        public ApiBaseResponseModel Del<#=tb_name#>DetailByIDs(ApiBaseRequestModel<List<int>> request)
         {
             var response = new ApiBaseResponseModel();
             try

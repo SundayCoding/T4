@@ -12,7 +12,7 @@
 
 <#		
 		//生成单张表
-		var createname="OrderDocImport";
+		var createname="MES_Process";
 		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
 		SqlConnection conn = new SqlConnection(connectionString);
 		conn.Open();
@@ -233,7 +233,7 @@ namespace FttData.Api.Controllers.VersionWEB
 
 		#region <#=tb_name#>_Name明细（增,删，查）
         /// <summary>
-        /// 根据生产订单ID获取生产订单明细
+        /// 根据<#=tb_name#>_NameID获取<#=tb_name#>_Name明细
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -243,11 +243,11 @@ namespace FttData.Api.Controllers.VersionWEB
             var response = new ApiBaseResponseTotal<dynamic>();
             if (!this.CheckUser(request, response, out UserRule user))
                 return response;
-            OrderDocImportService service = new OrderDocImportService(user);
+             <#=tb_name#>Service service = new  <#=tb_name#>Service(user);
             return service.Get<#=tb_name#>DetailBy<#=tb_name#>ID(request);
         }
         /// <summary>
-        /// 添加生产订单明细
+        /// 添加<#=tb_name#>_Name明细
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -257,11 +257,11 @@ namespace FttData.Api.Controllers.VersionWEB
             var response = new ApiBaseResponseModel();
             if (!this.CheckUser(request, response, out UserRule user))
                 return response;
-            OrderDocImportService service = new OrderDocImportService(user);
+            <#=tb_name#>Service service = new <#=tb_name#>Service(user);
             return service.Add<#=tb_name#>Detail(request);
         }
         /// <summary>
-        /// 删除生产订单明细
+        /// 删除<#=tb_name#>_Name明细
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -271,7 +271,7 @@ namespace FttData.Api.Controllers.VersionWEB
             var response = new ApiBaseResponseModel();
             if (!this.CheckUser(request, response, out UserRule user))
                 return response;
-            OrderDocImportService service = new OrderDocImportService(user);
+            <#=tb_name#>Service service = new <#=tb_name#>Service(user);
             return service.Del<#=tb_name#>DetailByIDs(request);
         }
         #endregion
