@@ -146,7 +146,7 @@ namespace FttData.Api.Controllers.VersionWEB
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-		public ApiBaseResponseModel Add([FromBody]ApiPageBaseRequestModel<<#=tb_name#>> request)
+		public ApiBaseResponseModel Add([FromBody]ApiPageBaseRequestModel<<#=tb_name#>Exent> request)
         {
             var response = new ApiBaseResponseModel();
             if (!this.CheckUser(request, response, out UserRule user))
@@ -163,7 +163,7 @@ namespace FttData.Api.Controllers.VersionWEB
         /// <param name="request"></param>
         /// <returns></returns>
 		[HttpPost]
-        public ApiBaseResponseModel Edit([FromBody]ApiPageBaseRequestModel<<#=tb_name#>> request)
+        public ApiBaseResponseModel Edit([FromBody]ApiPageBaseRequestModel<<#=tb_name#>Exent> request)
         {
             var response = new ApiBaseResponseModel();
             if (!this.CheckUser(request, response, out UserRule user))

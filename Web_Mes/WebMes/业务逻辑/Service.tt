@@ -193,7 +193,7 @@ namespace FttData.Api.BLL.Service
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ApiBaseResponseModel Add(ApiPageBaseRequestModel<<#=tb_name#>> request)
+        public ApiBaseResponseModel Add(ApiPageBaseRequestModel<<#=tb_name#>Exent> request)
         {
             var response = new ApiBaseResponseModel();
             try
@@ -237,7 +237,7 @@ namespace FttData.Api.BLL.Service
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ApiBaseResponseModel Update(ApiPageBaseRequestModel<<#=tb_name#>> request)
+        public ApiBaseResponseModel Update(ApiPageBaseRequestModel<<#=tb_name#>Exent> request)
         {
             var response = new ApiBaseResponseModel();
 
