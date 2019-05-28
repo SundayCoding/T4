@@ -12,7 +12,7 @@
 
 <#		
 		//生成单张表
-		var createname="MES_ProcessDetail";
+		var createname="D_ProductPrintDetail";
 		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
 		SqlConnection conn = new SqlConnection(connectionString);
 		conn.Open();
@@ -41,7 +41,8 @@
 *
 *Author:		<zhangby>
 *Create date:   <<#=DateTime.Now#>>
-*Description:	本页面有T4模板自动生成,注意代码被覆盖
+*Description:	本页面有T4模板自动生成,并不完全正确,根据实际情况进行修改
+*				根据业务实际需要添加修改删除代码
 *
 */
 using System;
@@ -81,6 +82,29 @@ namespace FttData.Model.WEB.<#=tb_name#>Model
 		PopIndent();
 		#>
 	}
+	#endregion
+
+	#region 明细集合
+	/// <summary>
+    /// 待处理查询参数
+    /// </summary>
+   public class <#=tb_name#>Exent :<#=tb_name#> 
+    {
+        /// <summary>
+        /// 明细集合
+        /// </summary>
+        public  List<<#=tb_name#>Detail> <#=tb_name#>DetailList {  set;get; }
+    }
+	#endregion
+
+	#region 待处理数据查询条件
+	/// <summary>
+    /// 待处理查询参数
+    /// </summary>
+    public class PendingDataParameters
+    {
+        
+    }
 	#endregion
 }
 	

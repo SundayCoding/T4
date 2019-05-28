@@ -47,7 +47,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>JSON.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\Model\MES_ProcessDetailModle.cs">
+    <Compile Include="WebMes\Model\D_ProductPrintDetailModle.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="WebMes\Model\Model2.cs">
@@ -55,7 +55,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\业务逻辑\MES_ProcessService.cs">
+    <Compile Include="WebMes\业务逻辑\D_ProductPrintService.cs">
       <DependentUpon>Service.tt</DependentUpon>
     </Compile>
     <Compile Include="WebMes\业务逻辑\Service2.cs">
@@ -68,7 +68,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Controller.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\控制器\MES_ProcessController.cs">
+    <Compile Include="WebMes\控制器\D_ProductPrintController.cs">
       <DependentUpon>Controller.tt</DependentUpon>
     </Compile>
   </ItemGroup>

@@ -12,7 +12,7 @@
 
 <#		
 		//生成单张表
-		var createname="MES_Process";
+		var createname="D_ProductPrint";
 		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
 		SqlConnection conn = new SqlConnection(connectionString);
 		conn.Open();
@@ -45,7 +45,8 @@
 *
 *Author:		<zhangby>
 *Create date:   <<#=DateTime.Now#>>
-*Description:	本页面有T4模板自动生成,注意代码被覆盖
+*Description:	本页面有T4模板自动生成,并不完全正确,根据实际情况进行修改
+*				根据业务实际需要添加修改删除代码
 *
 */
 using FluentData;
@@ -124,6 +125,7 @@ namespace FttData.Api.BLL.Service
 			updateAutomap = automapItems[0];
 			}
 		#>
+
 		#region 初始化
 		/// <summary>
         /// 用户
@@ -144,6 +146,8 @@ namespace FttData.Api.BLL.Service
         {
         }
         #endregion 
+
+		#region Master主表操作
 
 		#region <#=tb_name#>_Name(Get)
 		/// <summary>
@@ -356,6 +360,8 @@ namespace FttData.Api.BLL.Service
         }
 		#endregion
 
+		#endregion
+
 		//明细操作  如果不需要则注释
 		#region <#=tb_name#>_Name明细 增删改方法组
         private void _insertDetail(IDbContext db, <#=tb_name#>Detail entity)
@@ -373,7 +379,7 @@ namespace FttData.Api.BLL.Service
         #endregion
 
 
-		   #region <#=tb_name#>_Name明细（增,删,查）
+		#region <#=tb_name#>_Name明细（增,删,查）
         /// <summary>
         /// <#=tb_name#>_Name明细 获取 根据<#=tb_name#>_NameID
         /// </summary>
@@ -453,6 +459,50 @@ namespace FttData.Api.BLL.Service
         }
 
         #endregion
+
+		//下方获取待处理数据，如果不需要则删除
+		#region 获取待处理数据
+
+		/// <summary>
+        /// 获取待处理数据
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiBaseResponseTotal<dynamic> GetPendingData(ApiPageBaseRequestModel<PendingDataParameters> request)
+        {
+            var response = new ApiBaseResponseTotal<dynamic>();
+            try
+            {
+                var db = Db.getContext();
+                using (var command = db.NewContext().MultiResultSql)
+                {
+                    var sql = @"  ";
+                    var sqlcount = @" ";
+                    #region Where添加条件
+                    //if (request.data.StartTime.HasValue && request.data.EndTime.HasValue)
+                    //{
+                      //  var datesql = $" and b.CreateDate between  '{request.data.StartTime.Value}' and  '{request.data.EndTime.Value}')";
+                      //  sql += datesql;
+                      //  sqlcount += datesql;
+                   // }
+
+                    #endregion
+                    sql += $" order by ID  OFFSET ({request.PageIndex} - 1)  * {request.PageSize} rows fetch next {request.PageSize}  rows only;";
+                    var res = command.Sql(sql + sqlcount).QueryMany<dynamic>().ToArray();
+                    response.items = res;
+                    response.total = command.QuerySingle<int>();
+                }
+                response.success = true;
+            }
+            catch (Exception ex)
+            {
+                response.success = false;
+                response.message = ex.Message;
+            }
+            return response;
+        }
+
+		#endregion
 
 
 	}

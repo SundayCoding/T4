@@ -12,7 +12,7 @@
 
 <#		
 		//生成单张表
-		var createname="MES_Process";
+		var createname="D_ProductPrint";
 		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
 		SqlConnection conn = new SqlConnection(connectionString);
 		conn.Open();
@@ -42,7 +42,8 @@
 *
 *Author:		<zhangby>
 *Create date:   <<#=DateTime.Now#>>
-*Description:	本页面有T4模板自动生成,注意代码被覆盖
+*Description:	本页面有T4模板自动生成,并不完全正确,根据实际情况进行修改
+*				根据业务实际需要添加修改删除代码
 *
 */
 using FttData.Core;
@@ -206,7 +207,7 @@ namespace FttData.Api.Controllers.VersionWEB
         }
 		#endregion
 
-		 #region ComboxStore
+		#region ComboxStore
         /// <summary>
         /// 获取页面加载ComBox集合
 		/// 这里是一次性加载页面所有用到的,如果需要用到带有条件的则修改ApiBaseRequestModel，添加参数类型
@@ -275,6 +276,25 @@ namespace FttData.Api.Controllers.VersionWEB
             return service.Del<#=tb_name#>DetailByIDs(request);
         }
         #endregion
+
+		
+		//下方获取待处理数据，如果不需要则删除
+		#region 获取待处理数据
+		/// <summary>
+        /// 获取待处理数据
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiBaseResponseTotal<dynamic> GetPendingData([FromBody]ApiPageBaseRequestModel<PendingDataParameters> request)
+        {
+            var response = new ApiBaseResponseTotal<dynamic>();
+            if (!this.CheckUser(request, response, out UserRule user))
+                return response;
+            <#=tb_name#>Service service = new <#=tb_name#>Service(user);
+            return service.GetPendingData(request);
+        }
+		#endregion
 	}
 	
 }
