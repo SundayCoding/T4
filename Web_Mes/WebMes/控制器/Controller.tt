@@ -12,7 +12,7 @@
 
 <#		
 		//生成单张表
-		var createname="D_ProductPrint";
+		var createname="MES_StyleProcess";
 		string connectionString= "Password=sa;Persist Security Info=True;User ID=sa;Initial Catalog=FTT_MES;Data Source=192.168.1.204";		
 		SqlConnection conn = new SqlConnection(connectionString);
 		conn.Open();
@@ -53,7 +53,7 @@ using FttData.Model.WEB.<#=tb_name.Trim()#>Model;
 using System.Collections.Generic;
 using System.Web.Http;
 using FttData.Api.BLL.Service;
-using FttData.Api.BLL.Base;
+using FttData.Rule.Code.Base;
 namespace FttData.Api.Controllers.VersionWEB
 {	
 	/// <summary>
