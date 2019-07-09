@@ -47,20 +47,20 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>JSON.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\Model\MES_StyleProcessDetailModle.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
     <Compile Include="WebMes\Model\Model2.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\业务逻辑\MES_StyleProcessService.cs">
-      <DependentUpon>Service.tt</DependentUpon>
+    <Compile Include="WebMes\Model\Sys_LanguageModle.cs">
+      <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="WebMes\业务逻辑\Service2.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
+      <DependentUpon>Service.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WebMes\业务逻辑\Sys_LanguageSourceService.cs">
       <DependentUpon>Service.tt</DependentUpon>
     </Compile>
     <Compile Include="WebMes\控制器\Controller2.cs">
@@ -68,7 +68,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Controller.tt</DependentUpon>
     </Compile>
-    <Compile Include="WebMes\控制器\MES_StyleProcessController.cs">
+    <Compile Include="WebMes\控制器\Sys_LanguageSourceController.cs">
       <DependentUpon>Controller.tt</DependentUpon>
     </Compile>
   </ItemGroup>
